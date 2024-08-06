@@ -1,2 +1,2 @@
 # PPPwn-Jetson
-PPPwn on jeyson nano
+PPPwn on jetson nano
