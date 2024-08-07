@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PPPwn-Jetson</title>
+    <style>
+        @font-face {
+            font-family: 'TERMINAL';
+            src: url('VT323/VT323-Regular.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+        @font-face {
+            font-family: 'TITLE';
+            src: url('Nunito/Nunito-VariableFont_wght.ttf') format('truetype');
+            font-weight: normal;
+            font-style: normal;
+        }
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            font-family: 'TITLE';
+            background-color: #1E1E1E;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .card {
+            background-color: #333;
+            border-radius: 16px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 600px;
+            padding: 20px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 80%;
+        }
+        .card h1 {
+            margin: 0;
+            text-align: center;
+            text-shadow: 2px 2px 5px #000000;
+        }
+        .card .control {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+        .card button {
+            flex: 1;
+            max-width: 200px;
+            padding: 15px 32px;
+            margin: 4px;
+            font-size: 20px;
+            font-family: 'TITLE';
+            border: none;
+            border-radius: 4px;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.4s ease;
+        }
+        .card #run {
+            background-color: #006600;
+        }
+        .card #stop {
+            background-color: #660000;
+        }
+        .card button:hover {
+            opacity: 0.8;
+        }
+        #result {
+            overflow-y: auto;
+            flex-grow: 1;
+            margin-top: 20px;
+            border-radius: 16px;
+            box-shadow: inset 0 0 20px #006600;
+            background: black;
+            background-size: 100% 4px;
+            padding: 10px;
+        }
+        .logger{
+            font-family: 'TERMINAL';
+            font-size: 26px;
+            color: #006600;
+        }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>PPPwn-Jetson</h1>
+        <div id="result" calss="logger"></div>
+        <div class="control">
+            <button id="run">Run</button>
+            <button id="stop">Stop</button>
+        </div>
+    </div>
+    <script>
+        
+        const source = new EventSource("pppwn.log");
+        const result = document.getElementById("result");
+
+        function log(msg) {
+            result.innerHTML += `<span class="logger">${msg}</span><br>`;
+            result.scrollTop = result.scrollHeight;
+        }
+
+        function clearLog() {
+            result.innerHTML = "";
+            result.scrollTop = 0;
+        }
+
+        source.onmessage = function (event) {
+            log(event.data);
+        };
+
+        document.getElementById("run").addEventListener("click", function () {
+            clearLog();
+            fetch('/run', {method: 'POST'})
+                .then(response => response.json())
+                .then(() => {
+                    console.log("Started");
+                })
+                .catch((error) => {
+                    log('Server Error: ' + error);
+                });
+        });
+
+        document.getElementById("stop").addEventListener("click", function () {
+            fetch('/stop', {method: 'POST'})
+                .then(response => response.json())
+                .then(() => {
+                    console.log("Stopped");
+                })
+                .catch((error) => {
+                    log('Server Error: ' + error);
+                });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+#!/bin/sh
+
+shift $(($#-2))
+rc=$2
+res=$1
+
+@ZIG@ rc -I . /fo "$res" -- "$rc"
